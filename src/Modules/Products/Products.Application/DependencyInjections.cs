@@ -6,6 +6,9 @@ using FluentValidation;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Products.Application.Features.ProductImports.Interfaces;
+using Products.Application.Features.ProductImports.Services;
+
 namespace Products.Application;
 
 public static class DependencyInjections

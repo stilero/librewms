@@ -23,4 +23,6 @@ public class Result
     public static Result<T> Failure<T>(ErrorResult error) => new(error);
 
     public static implicit operator Result(ErrorResult error) => new(error);
+
+    public Result ToResult() => throw new NotImplementedException();
 }

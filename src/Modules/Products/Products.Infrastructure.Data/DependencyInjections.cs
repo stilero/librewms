@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using BuildingBlocks.Application.Interfaces;
 using Products.Application.Features.Products.Common.Repositories;
 using Products.Application.Features.ProductImports.Interfaces;
+using Products.Infrastructure.Data.Common.Repositories;
+using Products.Infrastructure.Data.Features.Products;
+using Products.Infrastructure.Data.Features.ProductImports.Repositories;
 
 namespace Products.Infrastructure.Data;
 
@@ -49,5 +52,4 @@ public static class DependencyInjections
         services.AddScoped<IProductImportLineRepository, ProductImportLineRepository>();
         return services;
     }
-
 }

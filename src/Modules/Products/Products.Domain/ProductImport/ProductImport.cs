@@ -52,7 +52,6 @@ public sealed class ProductImport : AggregateRoot
         {
             RaiseDomainEvent(new ProductImportValidationFailed(this));
         }
-
     }
 
     public IEnumerable<Product> ProcessLinesAndReturnProducts()
@@ -82,6 +81,7 @@ public sealed class ProductImport : AggregateRoot
                 }
             }
         }
+
         return products;
     }
 }

@@ -15,9 +15,6 @@ public sealed class ProductImportLine
     public ProductImport ProductImport { get; private set; }
     public Guid ProductImportId { get; private set; }
 
-
-
-
     public static ProductImportLine CreateNew(string productName, string productSku, string productDescription, string productManufacturer, string productCategory, string productStatus, ProductImport productImport)
         => new()
         {

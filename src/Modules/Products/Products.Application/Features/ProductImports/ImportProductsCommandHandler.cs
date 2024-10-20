@@ -2,6 +2,9 @@ using BuildingBlocks.Application.Interfaces;
 using BuildingBlocks.Application.Messaging.Interfaces;
 using BuildingBlocks.Application.Models.Results;
 
+using Products.Application.Features.ProductImports.Errors;
+using Products.Application.Features.ProductImports.Interfaces;
+
 namespace Products.Application.Features.ProductImports;
 public sealed class ImportProductsCommandHandler : ICommandHandler<ImportProductsCommand, Guid>
 {
@@ -18,7 +21,7 @@ public sealed class ImportProductsCommandHandler : ICommandHandler<ImportProduct
     {
         if (request is null)
         {
-            return ImportProductsErrors.InvalidRequest;
+            return ImportProductsError.InvalidRequest;
         }
 
         var result = await _productImportService.CreateNew(request.Request, cancellationToken);
