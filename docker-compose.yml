@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+ 
+
+  librewms.functionapp:
+    image: ${DOCKER_REGISTRY-}librewmsfunctionapp
+    build:
+      context: .
+      dockerfile: src/Functions/LibreWms.FunctionApp/Dockerfile
+

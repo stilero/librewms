@@ -5,8 +5,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "stilestream.wms.products.functionapp",
-          "Port": 33930
+          "Host": "librewms.functionapp",
+          "Port": 7101
         }
       ],
       "UpstreamPathTemplate": "/api/products/import",
@@ -17,8 +17,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "stilestream.wms.products.functionapp",
-          "Port": 33930
+          "Host": "librewms.functionapp",
+          "Port": 7101
         }
       ],
       "UpstreamPathTemplate": "/api/products{id}",
