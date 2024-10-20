@@ -1,0 +1,28 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/products/import",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "stilestream.wms.products.functionapp",
+          "Port": 33930
+        }
+      ],
+      "UpstreamPathTemplate": "/api/products/import",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/products/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "stilestream.wms.products.functionapp",
+          "Port": 33930
+        }
+      ],
+      "UpstreamPathTemplate": "/api/products{id}",
+      "UpstreamHttpMethod": [ "DELETE" ]
+    }
+  ]
+}
