@@ -1,4 +1,4 @@
-# librewms
+# LibreWarehouse
 An open-source Warehouse Management System (WMS) designed to streamline and optimize your warehouse operations.
 ## Table of Contents
 - Introduction
