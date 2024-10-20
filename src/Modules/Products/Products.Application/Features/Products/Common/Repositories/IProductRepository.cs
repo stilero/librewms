@@ -1,6 +1,6 @@
 using Products.Domain;
 
-namespace Products.Application.Features.Products.Repositories;
+namespace Products.Application.Features.Products.Common.Repositories;
 public interface IProductRepository
 {
     Task AddAsync(Product product, CancellationToken cancellationToken = default);

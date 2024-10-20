@@ -1,5 +1,7 @@
 using BuildingBlocks.Domain.Primitives;
 
+using Products.Domain.ProductImport.Entities;
+using Products.Domain.ProductImport.Events;
 using Products.Domain.ProductImport.ValueObjects;
 
 namespace Products.Domain.ProductImport;

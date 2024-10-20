@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using BuildingBlocks.Application.Interfaces;
+using Products.Application.Features.Products.Common.Repositories;
+using Products.Application.Features.ProductImports.Interfaces;
 
 namespace Products.Infrastructure.Data;
 
