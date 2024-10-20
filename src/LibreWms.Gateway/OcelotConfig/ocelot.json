@@ -15,8 +15,8 @@
       "DownstreamHeaderTransform": {},
       "DownstreamHostAndPorts": [
         {
-          "Host": "stilestream.wms.products.functionapp",
-          "Port": 33930
+          "Host": "librewms.functionapp",
+          "Port": 7101
         }
       ],
       "DownstreamHttpMethod": null,
@@ -92,8 +92,8 @@
       "DownstreamHeaderTransform": {},
       "DownstreamHostAndPorts": [
         {
-          "Host": "stilestream.wms.products.functionapp",
-          "Port": 33930
+          "Host": "librewms.functionapp",
+          "Port": 7101
         }
       ],
       "DownstreamHttpMethod": null,
@@ -214,7 +214,7 @@
       ],
       "StringSplitOption": "None",
       "NumberStyle": "Any",
-      "CurrentCulture": "sv-SE"
+      "CurrentCulture": ""
     }
   }
 }
