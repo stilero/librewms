@@ -63,7 +63,7 @@ services:
     volumes:
     - ./src:/app
     - ./init/ef-migrations/run-migrations.sh:/run-migrations.sh
-    working_dir: /app/Products/StileStream.Wms.Products.Persistance
+    working_dir: /app/Modules/Products/Products.Infrastructure.Data
     entrypoint: ["/bin/bash", "/run-migrations.sh"]
     healthcheck:
       test: ["CMD", "test", "-f", "/tmp/migrations_done"]
@@ -78,7 +78,7 @@ services:
     image: ${DOCKER_REGISTRY-}librewmsfunctionapp
     build:
       context: .
-      dockerfile: src/Functions/LibreWms.FunctionApp/Dockerfile
+      dockerfile: src/LibreWms.FunctionApp/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__SqlServer=${PRODUCT_DB_CONNECTION_STRING}
