@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
@@ -24,7 +23,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 builder.Configuration.AddOcelot("OcelotConfig", app.Environment);
-
 
 await app.UseOcelot();
 await app.RunAsync();
