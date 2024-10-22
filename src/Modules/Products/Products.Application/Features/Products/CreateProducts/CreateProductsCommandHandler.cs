@@ -3,7 +3,7 @@ using BuildingBlocks.Application.Models.Results;
 
 using Products.Application.Features.Products.Common.Repositories;
 using Products.Application.Features.Products.CreateProducts.Contracts;
-using Products.Domain;
+using Products.Domain.AggregatesModel.ProductAggregate;
 
 namespace Products.Application.Features.Products.CreateProducts;
 public sealed class CreateProductsCommandHandler(IProductRepository productRepository) : ICommandHandler<CreateProductsCommand, CreateProductsResponse>

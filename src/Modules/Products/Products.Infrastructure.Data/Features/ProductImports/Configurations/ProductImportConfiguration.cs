@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Products.Domain.ProductImport;
+using Products.Domain.AggregatesModel.ProductImportAggregate;
 
 namespace Products.Infrastructure.Data.Features.ProductImports.Configurations;
 public class ProductImportConfiguration : IEntityTypeConfiguration<ProductImport>

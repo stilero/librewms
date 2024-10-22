@@ -3,8 +3,7 @@ using BuildingBlocks.Application.Models.Results;
 using Products.Application.Features.ProductImports.Contracts;
 using Products.Application.Features.ProductImports.Interfaces;
 using Products.Application.Features.Products.Common.Repositories;
-using Products.Domain.ProductImport;
-using Products.Domain.ProductImport.Entities;
+using Products.Domain.AggregatesModel.ProductImportAggregate;
 
 namespace Products.Application.Features.ProductImports.Services;
 public sealed class ProductImportService : IProductImportService
@@ -31,7 +30,7 @@ public sealed class ProductImportService : IProductImportService
         var stagingData = request.Data.Select(d => ProductImportLine.CreateNew(
             d.Name, d.Sku, d.Description, d.Manufacturer, d.Category, d.Status, import)
             ).ToList();
-        import.StageLines(stagingData);
+        import.AddLines(stagingData);
 
         await _productImportRepository.AddAsync(import, cancellationToken);
         await _stagedProductDataRepository.AddRangeAsync(stagingData, cancellationToken);

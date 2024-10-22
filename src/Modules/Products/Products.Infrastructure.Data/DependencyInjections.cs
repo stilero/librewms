@@ -7,13 +7,20 @@ using Products.Application.Features.ProductImports.Interfaces;
 using Products.Infrastructure.Data.Common.Repositories;
 using Products.Infrastructure.Data.Features.Products;
 using Products.Infrastructure.Data.Features.ProductImports.Repositories;
+using Products.Application;
 
 namespace Products.Infrastructure.Data;
 
 public static class DependencyInjections
 {
+    public static IServiceCollection AddProductsModule(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddProductsApplication();
+        services.AddProductsInfrastructure(configuration);
+        return services;
+    }
 
-    public static IServiceCollection AddProductsInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    internal static IServiceCollection AddProductsInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
 
@@ -23,7 +30,7 @@ public static class DependencyInjections
         return services;
     }
 
-    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    internal static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
 
@@ -44,7 +51,7 @@ public static class DependencyInjections
         return services;
     }
 
-    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    internal static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, ProductsUnitOfWork>();
         services.AddScoped<IProductRepository, ProductRepository>();

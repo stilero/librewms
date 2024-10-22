@@ -1,6 +1,4 @@
-using Products.Domain.ProductImport.ValueObjects;
-
-namespace Products.Domain.ProductImport.Entities;
+namespace Products.Domain.AggregatesModel.ProductImportAggregate;
 public sealed class ProductImportLine
 {
     public Guid Id { get; private set; }

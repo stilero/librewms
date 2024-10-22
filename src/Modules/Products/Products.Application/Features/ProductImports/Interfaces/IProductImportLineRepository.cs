@@ -1,4 +1,4 @@
-using Products.Domain.ProductImport.Entities;
+using Products.Domain.AggregatesModel.ProductImportAggregate;
 
 namespace Products.Application.Features.ProductImports.Interfaces;
 public interface IProductImportLineRepository

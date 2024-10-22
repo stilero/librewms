@@ -1,4 +1,4 @@
-namespace Products.Domain.ProductImport.ValueObjects;
+namespace Products.Domain.AggregatesModel.ProductImportAggregate;
 public enum StagingStatus
 {
     Pending,

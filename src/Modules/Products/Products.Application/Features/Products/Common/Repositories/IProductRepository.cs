@@ -1,4 +1,4 @@
-using Products.Domain;
+using Products.Domain.AggregatesModel.ProductAggregate;
 
 namespace Products.Application.Features.Products.Common.Repositories;
 public interface IProductRepository

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using Products.Application.Features.Products.Common.Repositories;
-using Products.Domain;
+using Products.Domain.AggregatesModel.ProductAggregate;
 
 namespace Products.Infrastructure.Data.Features.Products;
 public class ProductRepository(ProductsDbContext productsDbContext) : IProductRepository

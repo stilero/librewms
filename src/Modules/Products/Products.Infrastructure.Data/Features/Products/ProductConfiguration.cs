@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Products.Domain;
-using Products.Domain.Products.ValueObjects;
+using Products.Domain.AggregatesModel.ProductAggregate;
 
 namespace Products.Infrastructure.Data.Features.Products;
 public class ProductConfiguration : IEntityTypeConfiguration<Product>

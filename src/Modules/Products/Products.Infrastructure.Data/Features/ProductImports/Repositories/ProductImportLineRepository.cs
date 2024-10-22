@@ -1,5 +1,5 @@
 using Products.Application.Features.ProductImports.Interfaces;
-using Products.Domain.ProductImport.Entities;
+using Products.Domain.AggregatesModel.ProductImportAggregate;
 
 namespace Products.Infrastructure.Data.Features.ProductImports.Repositories;
 public sealed class ProductImportLineRepository(ProductsDbContext dbContext) : IProductImportLineRepository

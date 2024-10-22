@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
-using Products.Domain;
-using Products.Domain.ProductImport;
-using Products.Domain.ProductImport.Entities;
+using Products.Domain.AggregatesModel.ProductAggregate;
+using Products.Domain.AggregatesModel.ProductImportAggregate;
 
 namespace Products.Infrastructure.Data;
 public class ProductsDbContext : DbContext
