@@ -38,13 +38,7 @@ public sealed class ProductImport : Entity, IAggregateRoot
         }
 
         _lines.Add(importLine);
-    }
-
-    public void SetStatusStaged()
-    {
-        Status = ImportStatus.Staged;
-        AddDomainEvent(new ImportStagedDomainEvent(Id));
-    }
+    }   
 
     public void SetStatusProcessing()
     {
@@ -52,15 +46,15 @@ public sealed class ProductImport : Entity, IAggregateRoot
         AddDomainEvent(new ImportProcessingDomainEvent(Id));
     }
 
-    public void SetStatusValidated()
-    {
-        Status = ImportStatus.Validated;
-        AddDomainEvent(new ImportValidatedDomainEvent(Id));
-    }
-
     public void SetStatusCompleted()
     {
         Status = ImportStatus.Completed;
         AddDomainEvent(new ImportCompletedDomainEvent(Id));
+    }
+
+    public void SetStatusFailed()
+    {
+        Status = ImportStatus.Failed;
+        AddDomainEvent(new ImportFailedDomainEvent(Id));
     }
 }

@@ -1,7 +1,8 @@
 namespace Products.Domain.AggregatesModel.ProductImportAggregate;
-public enum StagingStatus
+public enum ImportLineStatus
 {
     Pending,
     Validated,
     Invalid,
+    Processed,
 }

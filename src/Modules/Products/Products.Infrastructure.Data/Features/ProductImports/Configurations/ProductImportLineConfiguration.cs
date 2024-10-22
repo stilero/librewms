@@ -17,7 +17,7 @@ public class ProductImportLineConfiguration : IEntityTypeConfiguration<ProductIm
         builder.Property(p => p.ProductStatus).HasMaxLength(50).HasDefaultValue(ProductStatus.Active);
         builder.Property(p => p.ProductSku).HasMaxLength(50).IsRequired();
         builder.Property(p => p.ProductName).HasMaxLength(100).IsRequired();
-        builder.Property(p => p.Status).HasMaxLength(50).HasConversion<string>().HasDefaultValue(StagingStatus.Pending);
+        builder.Property(p => p.Status).HasMaxLength(50).HasConversion<string>().HasDefaultValue(ImportLineStatus.Pending);
 
         builder.HasOne(p => p.ProductImport).WithMany(p => p.Lines).HasForeignKey(p => p.ProductImportId).OnDelete(DeleteBehavior.Cascade);
 

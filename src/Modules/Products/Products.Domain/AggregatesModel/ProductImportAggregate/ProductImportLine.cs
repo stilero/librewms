@@ -1,20 +1,23 @@
+using Common.Domain.SeedWork;
+
+using Products.Domain.Events;
+
 namespace Products.Domain.AggregatesModel.ProductImportAggregate;
-public sealed class ProductImportLine
+public sealed class ProductImportLine : Entity
 {
-    public Guid Id { get; private set; }
     public string ProductName { get; private set; } = string.Empty;
     public string ProductSku { get; private set; } = string.Empty;
     public string ProductDescription { get; private set; } = string.Empty;
     public string ProductManufacturer { get; private set; } = string.Empty;
     public string ProductCategory { get; private set; } = string.Empty;
     public string ProductStatus { get; private set; } = string.Empty;
-    public StagingStatus Status { get; private set; } = StagingStatus.Pending;
+    public ImportLineStatus Status { get; private set; } = ImportLineStatus.Pending;
     public string Message { get; private set; } = string.Empty;
-    public ProductImport ProductImport { get; private set; }
     public Guid ProductImportId { get; private set; }
 
-    public static ProductImportLine CreateNew(string productName, string productSku, string productDescription, string productManufacturer, string productCategory, string productStatus, ProductImport productImport)
-        => new()
+    public static ProductImportLine CreateNew(string productName, string productSku, string productDescription, string productManufacturer, string productCategory, string productStatus)
+    {
+        var line = new ProductImportLine
         {
             Id = Guid.NewGuid(),
             ProductName = productName,
@@ -23,44 +26,28 @@ public sealed class ProductImportLine
             ProductManufacturer = productManufacturer,
             ProductCategory = productCategory,
             ProductStatus = productStatus,
-            ProductImport = productImport
         };
 
-    public void Validate()
-    {
-        if (string.IsNullOrWhiteSpace(ProductName))
-        {
-            Status = StagingStatus.Invalid;
-            Message = "Product name is required.";
-        }
-        else if (string.IsNullOrWhiteSpace(ProductSku))
-        {
-            Status = StagingStatus.Invalid;
-            Message = "Product SKU is required.";
-        }
-        else if (string.IsNullOrWhiteSpace(ProductDescription))
-        {
-            Status = StagingStatus.Invalid;
-            Message = "Product description is required.";
-        }
-        else if (string.IsNullOrWhiteSpace(ProductManufacturer))
-        {
-            Status = StagingStatus.Invalid;
-            Message = "Product manufacturer is required.";
-        }
-        else if (string.IsNullOrWhiteSpace(ProductCategory))
-        {
-            Status = StagingStatus.Invalid;
-            Message = "Product category is required.";
-        }
-        else if (string.IsNullOrWhiteSpace(ProductStatus))
-        {
-            Status = StagingStatus.Invalid;
-            Message = "Product status is required.";
-        }
-        else
-        {
-            Status = StagingStatus.Validated;
-        }
+        line.AddDomainEvent(new ImportLineCreatedDomainEvent(line));
+        return line;
     }
-}
+
+    public void SetStatusValidated()
+    {
+        Status = ImportLineStatus.Validated;
+        AddDomainEvent(new ImportLineValidatedDomainEvent(Id));
+    }
+
+    public void SetStatusInvalid(string message)
+    {
+        Status = ImportLineStatus.Invalid;
+        Message = message;
+        AddDomainEvent(new ImportLineInvalidDomainEvent(Id));
+    }
+
+    public void SetStatusProcessed()
+    {
+        Status = ImportLineStatus.Processed;
+        AddDomainEvent(new ImportLineProcessedDomainEvent(Id));
+    }
+ }
