@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Products.Domain\Products.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\ProductImports\IntegrationEvents\" />
+  </ItemGroup>
+
 </Project>

@@ -24,7 +24,7 @@ public sealed class ProductImport : Entity, IAggregateRoot
             Type = type
         };
 
-        productImport.AddDomainEvent(new ImportCreatedEventDomainEvent(productImport));
+        productImport.AddDomainEvent(new ImportCreatedDomainEvent(productImport));
 
         return productImport;
     }
