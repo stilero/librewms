@@ -14,6 +14,7 @@ public sealed class ProductImportLine : Entity
     public ImportLineStatus Status { get; private set; } = ImportLineStatus.Pending;
     public string Message { get; private set; } = string.Empty;
     public Guid ProductImportId { get; private set; }
+    public ProductImport ProductImport { get; private set; }
 
     public static ProductImportLine CreateNew(string productName, string productSku, string productDescription, string productManufacturer, string productCategory, string productStatus)
     {

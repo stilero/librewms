@@ -3,6 +3,7 @@ using BuildingBlocks.Application.Models.Results;
 using Products.Application.Features.ProductImports.Contracts;
 using Products.Application.Features.ProductImports.Interfaces;
 using Products.Application.Features.Products.Common.Repositories;
+using Products.Domain.AggregatesModel.ProductAggregate;
 using Products.Domain.AggregatesModel.ProductImportAggregate;
 
 namespace Products.Application.Features.ProductImports.Services;
@@ -27,27 +28,41 @@ public sealed class ProductImportService : IProductImportService
         }
 
         var import = ProductImport.CreateNew(request.ImportType);
-        var stagingData = request.Data.Select(d => ProductImportLine.CreateNew(
-            d.Name, d.Sku, d.Description, d.Manufacturer, d.Category, d.Status, import)
-            ).ToList();
-        import.AddLines(stagingData);
+        foreach (var data in request.Data)
+        {
+            import.AddLine(ProductImportLine.CreateNew(
+                data.Name,
+                data.Sku,
+                data.Description,
+                data.Manufacturer,
+                data.Category,
+                data.Status));
+        }
 
-        await _productImportRepository.AddAsync(import, cancellationToken);
-        await _stagedProductDataRepository.AddRangeAsync(stagingData, cancellationToken);
+        _productImportRepository.Add(import);
+        await _productImportRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
         return import.Id;
     }
 
     public async Task<Result> ProcessImport(Guid importId, CancellationToken cancellationToken)
     {
-        var import = await _productImportRepository.FindAsync(importId, cancellationToken);
+        var import = await _productImportRepository.GetAsync(importId);
         if (import is null)
         {
             return ErrorResult.NotFound("ProductImportErrors.ImportNotFound", "Import not found");
         }
-
-        var products = import.ProcessLinesAndReturnProducts();
+        
+        import.SetStatusProcessing();
         _productImportRepository.Update(import);
-        await _productRepository.AddRangeAsync(products, cancellationToken);
+        foreach (var line in import.Lines)
+        {
+            var product = Product.CreateNew(line.ProductName, line.ProductSku, line.ProductDescription, line.ProductManufacturer, line.ProductCategory);
+            await _productRepository.AddAsync(product, cancellationToken);
+        }
+        await _productRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+        import.SetStatusCompleted();
+        _productImportRepository.Update(import);
+        await _productImportRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 }

@@ -8,6 +8,7 @@ using Products.Infrastructure.Data.Common.Repositories;
 using Products.Infrastructure.Data.Features.Products;
 using Products.Infrastructure.Data.Features.ProductImports.Repositories;
 using Products.Application;
+using Products.Domain.AggregatesModel.ProductAggregate;
 
 namespace Products.Infrastructure.Data;
 
