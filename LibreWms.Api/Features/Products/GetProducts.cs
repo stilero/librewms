@@ -18,7 +18,7 @@ public static class GetProducts
             string? sortOrder
         ) =>
         {
-            var query = db.Products.AsQueryable();
+            var query = db.Products.Where(p => !p.IsDeleted).AsQueryable();
 
             // Filtering
             if (!string.IsNullOrWhiteSpace(name))

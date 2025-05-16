@@ -22,6 +22,7 @@ public class ProductsDbContext : DbContext
             entity.Property(e => e.Weight).HasColumnType("decimal(18,2)");
             entity.Property(e => e.Category).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.IsDeleted).IsRequired();
         });
     }
 }

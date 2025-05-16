@@ -42,6 +42,7 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapGetProductsEndpoint();
 app.MapCreateProductEndpoint();
+app.MapDeleteProductEndpoint();
 
 app.Run();
 
