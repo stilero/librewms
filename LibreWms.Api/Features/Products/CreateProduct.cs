@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibreWms.Api.Features.Products;
 
@@ -7,12 +8,12 @@ public static class CreateProduct
 {
     public static void MapCreateProductEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/api/products", async (Product product, HttpContext context) =>
+        endpoints.MapPost("/api/products", async (Product product, ProductsDbContext db, HttpContext context) =>
         {
-            // In-memory example, replace with real data access later
             product.Id = Guid.NewGuid();
             product.CreatedAt = DateTime.UtcNow;
-            // Return the created product
+            db.Products.Add(product);
+            await db.SaveChangesAsync();
             await context.Response.WriteAsJsonAsync(product);
         })
         .WithName("CreateProduct")
