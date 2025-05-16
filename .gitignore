@@ -400,3 +400,5 @@ FodyWeavers.xsd
 /LibreWms.Api/appsettings.Local.json
 /LibreWms.Api/appsettings.Development.json
 /LibreWms.MigrationService/appsettings.Local.json
+/LibreWms.MigrationService/appsettings.Development.json
+/LibreWms.AppHost/appsettings.Development.json
