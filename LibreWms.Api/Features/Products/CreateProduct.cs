@@ -10,7 +10,25 @@ public static class CreateProduct
     {
         endpoints.MapPost("/api/products", async (Product product, ProductsDbContext db, HttpContext context) =>
         {
-            product.Id = Guid.NewGuid();
+            // Validation: Name and UnitOfMeasure are required
+            if (string.IsNullOrWhiteSpace(product.Name) || string.IsNullOrWhiteSpace(product.UnitOfMeasure))
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new { error = "Name and UnitOfMeasure are required." });
+                return;
+            }
+
+            // Ensure unique Id (should be unique by DB, but check for explicit Id)
+            if (await db.Products.AnyAsync(p => p.Id == product.Id))
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new { error = "A product with this Id already exists." });
+                return;
+            }
+
+            // If Id is empty, generate a new one
+            if (product.Id == Guid.Empty)
+                product.Id = Guid.NewGuid();
             product.CreatedAt = DateTime.UtcNow;
             db.Products.Add(product);
             await db.SaveChangesAsync();
