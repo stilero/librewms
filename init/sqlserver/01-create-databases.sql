@@ -1,4 +1,0 @@
-CREATE DATABASE LibreWms;
-GO
-CREATE DATABASE LibreWmsProducts;
-GO
