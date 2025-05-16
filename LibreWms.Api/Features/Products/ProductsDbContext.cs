@@ -18,6 +18,9 @@ public class ProductsDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.Quantity).IsRequired();
             entity.Property(e => e.UnitOfMeasure).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Gtin).HasMaxLength(50);
+            entity.Property(e => e.Weight).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Category).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).IsRequired();
         });
     }
