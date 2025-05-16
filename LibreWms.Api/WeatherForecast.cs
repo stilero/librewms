@@ -1,1 +1,1 @@
-// This file has been removed as part of the vertical slice refactor for the products feature.
+// This file has been removed as part of cleaning up WeatherForecast traces.
