@@ -1,6 +1,4 @@
 using LibreWms.Api.Data;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibreWms.Api.Features.Products;
