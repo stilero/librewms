@@ -1,3 +1,4 @@
+using LibreWms.Api.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ public static class DeleteProduct
 {
     public static void MapDeleteProductEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapDelete("/api/products/{id:guid}", async (Guid id, ProductsDbContext db, HttpContext context) =>
+        endpoints.MapDelete("/api/products/{id:guid}", async (Guid id, LibreWmsDbContext db, HttpContext context) =>
         {
             var product = await db.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null || product.IsDeleted)

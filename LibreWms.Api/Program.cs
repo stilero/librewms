@@ -1,10 +1,11 @@
+using LibreWms.Api.Data;
 using LibreWms.Api.Features.Products;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add EF Core with Postgres
-builder.Services.AddDbContext<ProductsDbContext>(options =>
+builder.Services.AddDbContext<LibreWmsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.

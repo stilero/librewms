@@ -1,16 +1,19 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Add a PostgreSQL container resource using AddContainer
-var postgres = builder.AddContainer("postgres", "postgres:16-alpine")
-    .WithEnvironment("POSTGRES_USER", "postgres")
-    .WithEnvironment("POSTGRES_PASSWORD", "postgres")
-    .WithEnvironment("POSTGRES_DB", "librewms");
+// Add a PostgreSQL resource using Aspire's AddPostgres
+var password = builder.AddParameter("postgres-username", secret: true);
+var username = builder.AddParameter("postgres-password", secret: true);
+var postgres = builder.AddPostgres("postgres", username, password)
+    .WithPgAdmin()
+    .AddDatabase("librewms");
 
-// Compose the connection string manually
-var connectionString = "Host=localhost;Port=5432;Database=librewms;Username=postgres;Password=postgres";
-
-// Add the API project and set the connection string
+// Add the API project and connect it to the PostgreSQL resource
 builder.AddProject<Projects.LibreWms_Api>("librewms-api")
-    .WithEnvironment("ConnectionStrings__DefaultConnection", connectionString);
+    .WithReference(postgres)
+    .WaitFor(postgres);
+
+builder.AddProject<Projects.LibreWms_MigrationService>("librewms-migrationservice")
+    .WithReference(postgres)
+    .WaitFor(postgres);
 
 builder.Build().Run();

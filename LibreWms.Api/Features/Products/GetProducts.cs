@@ -1,3 +1,4 @@
+using LibreWms.Api.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ public static class GetProducts
     public static void MapGetProductsEndpoint(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapGet("/api/products", async (
-            ProductsDbContext db,
+            LibreWmsDbContext db,
             HttpContext context,
             string? name,
             string? category,

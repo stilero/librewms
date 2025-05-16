@@ -1,3 +1,4 @@
+using LibreWms.Api.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ public static class CreateProduct
 {
     public static void MapCreateProductEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/api/products", async (Product product, ProductsDbContext db, HttpContext context) =>
+        endpoints.MapPost("/api/products", async (Product product, LibreWmsDbContext db, HttpContext context) =>
         {
             // Validation: Name and UnitOfMeasure are required
             if (string.IsNullOrWhiteSpace(product.Name) || string.IsNullOrWhiteSpace(product.UnitOfMeasure))

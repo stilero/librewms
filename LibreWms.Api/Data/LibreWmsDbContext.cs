@@ -1,10 +1,11 @@
+using LibreWms.Api.Features.Products;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibreWms.Api.Features.Products;
+namespace LibreWms.Api.Data;
 
-public class ProductsDbContext : DbContext
+public class LibreWmsDbContext : DbContext
 {
-    public ProductsDbContext(DbContextOptions<ProductsDbContext> options) : base(options) { }
+    public LibreWmsDbContext(DbContextOptions<LibreWmsDbContext> options) : base(options) { }
 
     public DbSet<Product> Products => Set<Product>();
 
