@@ -17,6 +17,7 @@ public class ProductsDbContext : DbContext
             entity.Property(e => e.Sku).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.Quantity).IsRequired();
+            entity.Property(e => e.UnitOfMeasure).IsRequired().HasMaxLength(50);
             entity.Property(e => e.CreatedAt).IsRequired();
         });
     }
