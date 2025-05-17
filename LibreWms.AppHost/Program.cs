@@ -1,9 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Add a PostgreSQL resource using Aspire's AddPostgres
-var password = builder.AddParameter("postgres-username", secret: true);
-var username = builder.AddParameter("postgres-password", secret: true);
-var postgres = builder.AddPostgres("postgres", username, password)
+var username = builder.AddParameter("POSTGRESUSER", secret: true);
+var password = builder.AddParameter("POSTGRESSPASSWORD", secret: true);
+var postgres = builder.AddPostgres("postgres", username, password, 5432)
     .WithPgAdmin()
     .AddDatabase("librewms");
 
