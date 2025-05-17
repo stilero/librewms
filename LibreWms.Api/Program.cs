@@ -4,6 +4,8 @@ using LibreWms.Api.Features.Locations;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
+
 
 // Add EF Core with Postgres
 builder.Services.AddDbContext<LibreWmsDbContext>(options =>
@@ -13,6 +15,7 @@ builder.Services.AddDbContext<LibreWmsDbContext>(options =>
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

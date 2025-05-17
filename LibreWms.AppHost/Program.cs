@@ -10,6 +10,7 @@ var postgres = builder.AddPostgres("postgres", username, password, 5432)
 // Add the API project and connect it to the PostgreSQL resource
 builder.AddProject<Projects.LibreWms_Api>("librewms-api")
     .WithReference(postgres)
+    .WithExternalHttpEndpoints()
     .WaitFor(postgres);
 
 builder.AddProject<Projects.LibreWms_MigrationService>("librewms-migrationservice")
