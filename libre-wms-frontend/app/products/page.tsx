@@ -1,3 +1,4 @@
+// Update the existing products page to add a link to the new product page
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -12,6 +13,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Package, Plus, Search, Filter, MoreHorizontal, Edit, Trash, Copy, ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 export default function ProductsPage() {
   return (
@@ -21,8 +23,10 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Products & SKUs</h1>
           <p className="text-muted-foreground">Manage your product catalog and stock keeping units.</p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add Product
+        <Button asChild>
+          <Link href="/products/add">
+            <Plus className="mr-2 h-4 w-4" /> Add Product
+          </Link>
         </Button>
       </div>
 
