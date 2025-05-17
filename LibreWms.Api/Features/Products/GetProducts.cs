@@ -40,6 +40,11 @@ public static class GetProducts
             await context.Response.WriteAsJsonAsync(products);
         })
         .WithName("GetProducts")
-        .WithTags("Products");
+        .WithTags("Products")
+        .WithOpenApi(operation => new(operation)
+        {
+            Summary = "Gets all products",
+            Description = "Returns a list of products with optional filtering and sorting. Query parameters: name, category, unitOfMeasure, sortBy, sortOrder."
+        });
     }
 }

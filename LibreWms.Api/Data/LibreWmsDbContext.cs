@@ -1,4 +1,5 @@
 using LibreWms.Api.Features.Products;
+using LibreWms.Api.Features.Locations;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibreWms.Api.Data;
@@ -8,6 +9,7 @@ public class LibreWmsDbContext : DbContext
     public LibreWmsDbContext(DbContextOptions<LibreWmsDbContext> options) : base(options) { }
 
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<Location> Locations => Set<Location>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,6 +26,19 @@ public class LibreWmsDbContext : DbContext
             entity.Property(e => e.Category).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.IsDeleted).IsRequired();
+        });
+
+        modelBuilder.Entity<Location>(entity =>
+        {
+            entity.HasKey(e => e.LocationId);
+            entity.Property(e => e.LocationId).HasMaxLength(20);
+            entity.Property(e => e.Zone).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.Aisle).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.Rack).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.Capacity).IsRequired().HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Occupied).IsRequired().HasColumnType("decimal(5,2)");
+            entity.Property(e => e.Items).IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
         });
     }
 }

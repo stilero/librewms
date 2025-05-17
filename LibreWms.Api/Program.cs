@@ -1,5 +1,6 @@
 using LibreWms.Api.Data;
 using LibreWms.Api.Features.Products;
+using LibreWms.Api.Features.Locations;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,5 +25,8 @@ app.UseHttpsRedirection();
 app.MapGetProductsEndpoint();
 app.MapCreateProductEndpoint();
 app.MapDeleteProductEndpoint();
+
+// Register location endpoints
+app.MapLocationEndpoints();
 
 app.Run();
