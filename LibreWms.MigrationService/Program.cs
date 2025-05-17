@@ -12,5 +12,7 @@ builder.Services.AddOpenTelemetry()
 builder.Services.AddDbContext<LibreWmsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+
 var host = builder.Build();
 host.Run();

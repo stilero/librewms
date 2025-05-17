@@ -8,13 +8,23 @@ var postgres = builder.AddPostgres("postgres", username, password, 5432)
     .AddDatabase("librewms");
 
 // Add the API project and connect it to the PostgreSQL resource
-builder.AddProject<Projects.LibreWms_Api>("librewms-api")
+var migrationService = builder.AddProject<Projects.LibreWms_MigrationService>("librewms-migrationservice")
     .WithReference(postgres)
-    .WithExternalHttpEndpoints()
     .WaitFor(postgres);
 
-builder.AddProject<Projects.LibreWms_MigrationService>("librewms-migrationservice")
+var api = builder.AddProject<Projects.LibreWms_Api>("librewms-api")
     .WithReference(postgres)
-    .WaitFor(postgres);
+    .WithExternalHttpEndpoints()
+    .WaitFor(postgres)
+    .WaitFor(migrationService);
+
+builder.AddNpmApp("librewms-frontend", "../libre-wms-frontend")
+    .WithReference(api)
+    .WithEnvironment("BROWSER", "none")
+    .WithHttpEndpoint(env: "PORT")
+    .WithExternalHttpEndpoints()
+    .WaitFor(postgres)
+    .WaitFor(api)
+    .PublishAsDockerFile();
 
 builder.Build().Run();
