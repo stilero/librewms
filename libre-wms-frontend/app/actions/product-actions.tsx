@@ -37,7 +37,7 @@ const productSchema = z.object({
         }
         
         //Make the request to create the product
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/products`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/products`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

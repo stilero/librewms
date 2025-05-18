@@ -42,14 +42,13 @@ interface ProductsResponse {
 }
 
 export const useProducts = (options: UseProductsOptions = {}) => {
-  const {
-    page = 1,
-    pageSize = 10,
-    sortBy = 'name',
-    sortOrder = 'asc',
-    search = '',
-    category = ''
-  } = options
+  // Convert options into state variables
+  const [page, setPage] = useState(options.page ?? 1)
+  const [pageSize, setPageSize] = useState(options.pageSize ?? 10)
+  const [sortBy, setSortBy] = useState<keyof Product>(options.sortBy ?? 'name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(options.sortOrder ?? 'asc')
+  const [search, setSearch] = useState(options.search ?? '')
+  const [category, setCategory] = useState(options.category ?? '')
 
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -65,6 +64,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true)
+        setError(null)
         
         // Build query parameters
         const params = new URLSearchParams({
@@ -76,13 +76,19 @@ export const useProducts = (options: UseProductsOptions = {}) => {
           ...(category && { category })
         })
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/products?${params}`)
+        // Get API URL with fallback
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
+        console.log('Using API URL:', apiUrl)
+        console.log('Fetching products from:', `${apiUrl}/api/products?${params}`)
+        
+        const response = await fetch(`${apiUrl}/api/products?${params}`)
         
         if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`)
+          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText} (Url: ${apiUrl}/api/products?${params})` )
         }
 
         const data: ProductsResponse = await response.json()
+        console.log('Received products data:', data)
         
         // Transform the data to include status based on stock levels
         const productsWithStatus = data.items.map((product: Product) => ({
@@ -97,8 +103,8 @@ export const useProducts = (options: UseProductsOptions = {}) => {
           pageSize: data.pageSize,
           totalPages: data.totalPages
         })
-        setError(null)
       } catch (err) {
+        console.error('Error fetching products:', err)
         setError(err instanceof Error ? err : new Error('Failed to fetch products'))
       } finally {
         setIsLoading(false)
@@ -106,7 +112,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     }
 
     fetchProducts()
-  }, [page, pageSize, sortBy, sortOrder, search, category])
+  }, [page, pageSize, sortBy, sortOrder, search, category]) // Dependencies updated to use state variables
 
   const determineStockStatus = (product: Product): 'in_stock' | 'low_stock' | 'out_of_stock' => {
     if (product.stockLevel <= 0) return 'out_of_stock'
@@ -119,11 +125,12 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     isLoading,
     error,
     pagination,
-    setPage: (newPage: number) => options.page = newPage,
-    setPageSize: (newPageSize: number) => options.pageSize = newPageSize,
-    setSortBy: (field: keyof Product) => options.sortBy = field,
-    setSortOrder: (order: 'asc' | 'desc') => options.sortOrder = order,
-    setSearch: (term: string) => options.search = term,
-    setCategory: (cat: string) => options.category = cat
+    // Return the state setters directly
+    setPage,
+    setPageSize,
+    setSortBy,
+    setSortOrder,
+    setSearch,
+    setCategory
   }
 } 

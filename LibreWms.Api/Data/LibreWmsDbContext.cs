@@ -19,13 +19,22 @@ public class LibreWmsDbContext : DbContext
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Sku).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(1000);
-            entity.Property(e => e.Quantity).IsRequired();
+            entity.Property(e => e.StockLevel).IsRequired();
             entity.Property(e => e.UnitOfMeasure).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Gtin).HasMaxLength(50);
             entity.Property(e => e.Weight).HasColumnType("decimal(18,2)");
             entity.Property(e => e.Category).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.IsDeleted).IsRequired();
+            entity.Property(e => e.Width).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Height).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Length).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.UnitPrice).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.CostPrice).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.DefaultLocation).HasMaxLength(100);
+            entity.Property(e => e.Barcode).HasMaxLength(100);
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.IsTaxable).IsRequired();
         });
 
         modelBuilder.Entity<Location>(entity =>

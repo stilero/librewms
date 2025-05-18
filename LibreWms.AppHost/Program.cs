@@ -25,7 +25,7 @@ builder.AddNpmApp("librewms-frontend", "../libre-wms-frontend")
     .WithEnvironment("NEXT_PUBLIC_API_URL", api.GetEndpoint("https"))
     .WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", "0")
     .WithHttpEndpoint(env: "PORT")
-    .WithExternalHttpEndpoints()
+    .WithExternalHttpEndpoints()   
     .WaitFor(postgres)
     .WaitFor(api)
     .PublishAsDockerFile();
