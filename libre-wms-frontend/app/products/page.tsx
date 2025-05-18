@@ -1,4 +1,5 @@
-// Update the existing products page to add a link to the new product page
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -14,8 +15,60 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Package, Plus, Search, Filter, MoreHorizontal, Edit, Trash, Copy, ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { useProducts, type Product } from "./hooks/useProducts"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
+import { useState, useCallback } from "react"
+import { useDebounce } from "../../hooks/useDebounce"
 
 export default function ProductsPage() {
+  const [page, setPage] = useState(1)
+  const [pageSize] = useState(10)
+  const [sortBy, setSortBy] = useState<keyof Product>('name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+
+  // Debounce search term to avoid too many API calls
+  const debouncedSearch = useDebounce(searchTerm, 300)
+
+  const { products, isLoading, error, pagination } = useProducts({
+    page,
+    pageSize,
+    sortBy,
+    sortOrder,
+    search: debouncedSearch,
+    category: selectedCategory === 'all' ? '' : selectedCategory
+  })
+
+  const handleSort = useCallback((field: keyof Product) => {
+    if (field === sortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(field)
+      setSortOrder('asc')
+    }
+  }, [sortBy, sortOrder])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <span className="ml-3">Loading products...</span>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>{error.message}</AlertDescription>
+      </Alert>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -33,10 +86,16 @@ export default function ProductsPage() {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input type="search" placeholder="Search products by name, SKU, or description..." className="pl-9" />
+          <Input
+            type="search"
+            placeholder="Search products by name, SKU, or description..."
+            className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
         <div className="flex gap-2">
-          <Select defaultValue="all">
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
@@ -54,164 +113,146 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">SKU</TableHead>
-              <TableHead>Product Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-center">Stock</TableHead>
-              <TableHead>
-                <div className="flex items-center justify-end">
-                  Unit Price
-                  <ArrowUpDown className="ml-2 h-4 w-4" />
-                </div>
-              </TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">SKU-7723</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <Package className="h-4 w-4 text-gray-500" />
+      {products.length === 0 ? (
+        <div className="text-center py-10">
+          <Package className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-semibold text-gray-900">No products found</h3>
+          <p className="mt-1 text-sm text-gray-500">Get started by creating a new product.</p>
+          <div className="mt-6">
+            <Button asChild>
+              <Link href="/products/add">
+                <Plus className="mr-2 h-4 w-4" /> Add Product
+              </Link>
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px] cursor-pointer" onClick={() => handleSort('sku')}>
+                  <div className="flex items-center">
+                    SKU
+                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'sku' ? 'opacity-100' : 'opacity-50'}`} />
                   </div>
-                  <span>Premium Headphones</span>
-                </div>
-              </TableCell>
-              <TableCell>Electronics</TableCell>
-              <TableCell className="text-center">5</TableCell>
-              <TableCell className="text-right">$129.99</TableCell>
-              <TableCell>
-                <Badge variant="destructive">Low Stock</Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Edit className="mr-2 h-4 w-4" /> Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Copy className="mr-2 h-4 w-4" /> Duplicate
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">
-                      <Trash className="mr-2 h-4 w-4" /> Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">SKU-5521</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <Package className="h-4 w-4 text-gray-500" />
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
+                  <div className="flex items-center">
+                    Product Name
+                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'name' ? 'opacity-100' : 'opacity-50'}`} />
                   </div>
-                  <span>Wireless Keyboard</span>
-                </div>
-              </TableCell>
-              <TableCell>Electronics</TableCell>
-              <TableCell className="text-center">3</TableCell>
-              <TableCell className="text-right">$59.99</TableCell>
-              <TableCell>
-                <Badge variant="destructive">Low Stock</Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">SKU-9982</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <Package className="h-4 w-4 text-gray-500" />
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
+                  <div className="flex items-center">
+                    Category
+                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'category' ? 'opacity-100' : 'opacity-50'}`} />
                   </div>
-                  <span>USB-C Cable 2m</span>
-                </div>
-              </TableCell>
-              <TableCell>Electronics</TableCell>
-              <TableCell className="text-center">42</TableCell>
-              <TableCell className="text-right">$12.99</TableCell>
-              <TableCell>
-                <Badge variant="outline">In Stock</Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">SKU-3344</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <Package className="h-4 w-4 text-gray-500" />
+                </TableHead>
+                <TableHead className="text-center cursor-pointer" onClick={() => handleSort('stockLevel')}>
+                  <div className="flex items-center justify-center">
+                    Stock
+                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'stockLevel' ? 'opacity-100' : 'opacity-50'}`} />
                   </div>
-                  <span>Bluetooth Speaker</span>
-                </div>
-              </TableCell>
-              <TableCell>Electronics</TableCell>
-              <TableCell className="text-center">2</TableCell>
-              <TableCell className="text-right">$79.99</TableCell>
-              <TableCell>
-                <Badge variant="destructive">Low Stock</Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">SKU-6677</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <Package className="h-4 w-4 text-gray-500" />
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('unitPrice')}>
+                  <div className="flex items-center justify-end">
+                    Unit Price
+                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'unitPrice' ? 'opacity-100' : 'opacity-50'}`} />
                   </div>
-                  <span>Ergonomic Office Chair</span>
-                </div>
-              </TableCell>
-              <TableCell>Furniture</TableCell>
-              <TableCell className="text-center">8</TableCell>
-              <TableCell className="text-right">$199.99</TableCell>
-              <TableCell>
-                <Badge variant="outline">In Stock</Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('status')}>
+                  <div className="flex items-center">
+                    Status
+                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'status' ? 'opacity-100' : 'opacity-50'}`} />
+                  </div>
+                </TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell className="font-medium">{product.sku}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                        <Package className="h-4 w-4 text-gray-500" />
+                      </div>
+                      <span>{product.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{product.category}</TableCell>
+                  <TableCell className="text-center">{product.stockLevel}</TableCell>
+                  <TableCell className="text-right">${product.unitPrice.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        product.status === 'out_of_stock'
+                          ? 'destructive'
+                          : product.status === 'low_stock'
+                          ? 'secondary'
+                          : 'outline'
+                      }
+                    >
+                      {product.status === 'out_of_stock'
+                        ? 'Out of Stock'
+                        : product.status === 'low_stock'
+                        ? 'Low Stock'
+                        : 'In Stock'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href={`/products/${product.id}/edit`}>
+                            <Edit className="mr-2 h-4 w-4" /> Edit
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Copy className="mr-2 h-4 w-4" /> Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-600">
+                          <Trash className="mr-2 h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">Showing 5 of 25 products</div>
+        <div className="text-sm text-muted-foreground">
+          Showing {products.length} of {pagination.total} {pagination.total === 1 ? 'product' : 'products'}
+        </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" disabled>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+          >
             Previous
           </Button>
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= pagination.totalPages}
+            onClick={() => setPage(page + 1)}
+          >
             Next
           </Button>
         </div>

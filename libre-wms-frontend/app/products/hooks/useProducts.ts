@@ -1,0 +1,129 @@
+import { useState, useEffect } from 'react'
+
+export interface Product {
+  id: string
+  name: string
+  sku: string
+  description?: string
+  category: string
+  unitOfMeasure: string
+  width?: number
+  height?: number
+  length?: number
+  weight?: number
+  unitPrice: number
+  costPrice: number
+  minStockLevel?: number
+  maxStockLevel?: number
+  reorderPoint?: number
+  defaultLocation?: string
+  barcode?: string
+  isActive: boolean
+  isTaxable: boolean
+  stockLevel: number
+  status: 'in_stock' | 'low_stock' | 'out_of_stock'
+}
+
+interface UseProductsOptions {
+  page?: number
+  pageSize?: number
+  sortBy?: keyof Product
+  sortOrder?: 'asc' | 'desc'
+  search?: string
+  category?: string
+}
+
+interface ProductsResponse {
+  items: Product[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export const useProducts = (options: UseProductsOptions = {}) => {
+  const {
+    page = 1,
+    pageSize = 10,
+    sortBy = 'name',
+    sortOrder = 'asc',
+    search = '',
+    category = ''
+  } = options
+
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: page,
+    pageSize: pageSize,
+    totalPages: 0
+  })
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true)
+        
+        // Build query parameters
+        const params = new URLSearchParams({
+          page: page.toString(),
+          pageSize: pageSize.toString(),
+          sortBy,
+          sortOrder,
+          ...(search && { search }),
+          ...(category && { category })
+        })
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/products?${params}`)
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`)
+        }
+
+        const data: ProductsResponse = await response.json()
+        
+        // Transform the data to include status based on stock levels
+        const productsWithStatus = data.items.map((product: Product) => ({
+          ...product,
+          status: determineStockStatus(product)
+        }))
+
+        setProducts(productsWithStatus)
+        setPagination({
+          total: data.total,
+          page: data.page,
+          pageSize: data.pageSize,
+          totalPages: data.totalPages
+        })
+        setError(null)
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to fetch products'))
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [page, pageSize, sortBy, sortOrder, search, category])
+
+  const determineStockStatus = (product: Product): 'in_stock' | 'low_stock' | 'out_of_stock' => {
+    if (product.stockLevel <= 0) return 'out_of_stock'
+    if (product.minStockLevel && product.stockLevel <= product.minStockLevel) return 'low_stock'
+    return 'in_stock'
+  }
+
+  return {
+    products,
+    isLoading,
+    error,
+    pagination,
+    setPage: (newPage: number) => options.page = newPage,
+    setPageSize: (newPageSize: number) => options.pageSize = newPageSize,
+    setSortBy: (field: keyof Product) => options.sortBy = field,
+    setSortOrder: (order: 'asc' | 'desc') => options.sortOrder = order,
+    setSearch: (term: string) => options.search = term,
+    setCategory: (cat: string) => options.category = cat
+  }
+} 
