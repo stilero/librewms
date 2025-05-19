@@ -55,6 +55,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.MapGetProductsEndpoint();
+app.MapGetProductByIdEndpoint();
 app.MapCreateProductEndpoint();
 app.MapUpdateProductEndpoint();
 app.MapDeleteProductEndpoint();
