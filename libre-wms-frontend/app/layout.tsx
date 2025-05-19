@@ -21,6 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify({
+              NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
+            })};`
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <div className="flex h-screen overflow-hidden">

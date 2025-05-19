@@ -6,6 +6,28 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
+// Add CORS support
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            // In development, accept any localhost origin
+            policy.SetIsOriginAllowed(origin => 
+                new Uri(origin).Host == "localhost")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+        else
+        {
+            // In production, use specific origins
+            policy.WithOrigins("your-production-domain.com")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    });
+});
 
 // Add EF Core with Postgres
 builder.Services.AddDbContext<LibreWmsDbContext>(options =>
@@ -23,7 +45,14 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// Enable CORS
+app.UseCors();
+
+// Only use HTTPS redirection in production
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.MapGetProductsEndpoint();
 app.MapCreateProductEndpoint();

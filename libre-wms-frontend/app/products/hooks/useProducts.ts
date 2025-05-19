@@ -77,14 +77,37 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         })
 
         // Get API URL with fallback
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
-        console.log('Using API URL:', apiUrl)
-        console.log('Fetching products from:', `${apiUrl}/api/products?${params}`)
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
+          (typeof window !== 'undefined' ? window.ENV?.NEXT_PUBLIC_API_URL : '') || 
+          ''
         
-        const response = await fetch(`${apiUrl}/api/products?${params}`)
+        // Detailed debugging
+        console.log('Environment Debug Info:', {
+          processEnvApiUrl: process.env.NEXT_PUBLIC_API_URL,
+          windowEnvApiUrl: typeof window !== 'undefined' ? window.ENV?.NEXT_PUBLIC_API_URL : undefined,
+          finalApiUrl: apiUrl,
+          isWindowDefined: typeof window !== 'undefined',
+          windowEnvExists: typeof window !== 'undefined' && window.ENV !== undefined
+        })
+
+        const fullUrl = `${apiUrl}/api/products?${params}`
+        console.log('Full request URL:', fullUrl)
+        console.log('Request parameters:', Object.fromEntries(params.entries()))
+        
+        const response = await fetch(fullUrl)
+        
+        // Log response details before checking if it's ok
+        console.log('Response status:', response.status)
+        console.log('Response status text:', response.statusText)
         
         if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText} (Url: ${apiUrl}/api/products?${params})` )
+          console.error('Response error details:', {
+            status: response.status,
+            statusText: response.statusText,
+            url: fullUrl,
+            headers: Object.fromEntries(response.headers.entries())
+          })
+          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText} (Url: ${fullUrl})`)
         }
 
         const data: ProductsResponse = await response.json()
