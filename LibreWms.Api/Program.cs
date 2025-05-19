@@ -56,9 +56,12 @@ if (!app.Environment.IsDevelopment())
 
 app.MapGetProductsEndpoint();
 app.MapCreateProductEndpoint();
+app.MapUpdateProductEndpoint();
 app.MapDeleteProductEndpoint();
 
 // Register location endpoints
 app.MapLocationEndpoints();
 
 app.Run();
+
+public partial class Program { }
