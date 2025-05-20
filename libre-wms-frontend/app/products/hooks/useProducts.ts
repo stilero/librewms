@@ -31,6 +31,7 @@ interface UseProductsOptions {
   sortOrder?: 'asc' | 'desc'
   search?: string
   category?: string
+  refreshKey?: number
 }
 
 interface ProductsResponse {
@@ -130,7 +131,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     }
 
     fetchProducts()
-  }, [page, pageSize, sortBy, sortOrder, search, category]) // Use values from options directly
+  }, [page, pageSize, sortBy, sortOrder, search, category, options.refreshKey])
 
   const determineStockStatus = (product: Product): 'in_stock' | 'low_stock' | 'out_of_stock' => {
     if (product.stockLevel <= 0) return 'out_of_stock'

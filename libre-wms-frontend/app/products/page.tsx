@@ -21,6 +21,17 @@ import { AlertCircle } from "lucide-react"
 import { useState, useCallback } from "react"
 import { useDebounce } from "../../hooks/useDebounce"
 import { PRODUCT_CATEGORIES_WITH_ALL } from "@/constants/categories"
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog"
 
 export default function ProductsPage() {
   const [page, setPage] = useState(1)
@@ -29,6 +40,11 @@ export default function ProductsPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // Debounce search term to avoid too many API calls
   const debouncedSearch = useDebounce(searchTerm, 300)
@@ -39,7 +55,8 @@ export default function ProductsPage() {
     sortBy,
     sortOrder,
     search: debouncedSearch,
-    category: selectedCategory === 'all' ? '' : selectedCategory
+    category: selectedCategory === 'all' ? '' : selectedCategory,
+    refreshKey
   })
 
   const sortableFields: Array<keyof Product> = ['sku', 'name', 'category']
@@ -53,6 +70,34 @@ export default function ProductsPage() {
       setSortOrder('asc')
     }
   }, [sortBy, sortOrder])
+
+  // Delete product handler
+  const handleDeleteProduct = async () => {
+    if (!productToDelete) return
+    setDeleteLoading(true)
+    setDeleteError(null)
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.ENV?.NEXT_PUBLIC_API_URL : '') || ''
+      const response = await fetch(`${apiUrl}/api/products/${productToDelete.id}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        let msg = 'Failed to delete product.'
+        try {
+          const data = await response.json()
+          msg = data.error || msg
+        } catch {}
+        throw new Error(msg)
+      }
+      setDeleteDialogOpen(false)
+      setProductToDelete(null)
+      setRefreshKey(k => k + 1)
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to delete product.')
+    } finally {
+      setDeleteLoading(false)
+    }
+  }
 
   if (isLoading && products.length === 0) {
     return (
@@ -235,7 +280,10 @@ export default function ProductsPage() {
                           <Copy className="mr-2 h-4 w-4" /> Duplicate
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem className="text-red-600" onClick={() => {
+                          setProductToDelete(product)
+                          setDeleteDialogOpen(true)
+                        }}>
                           <Trash className="mr-2 h-4 w-4" /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -271,6 +319,30 @@ export default function ProductsPage() {
           </Button>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteError ? (
+                <span className="text-red-600">{deleteError}</span>
+              ) : (
+                <>Are you sure you want to delete <b>{productToDelete?.name}</b>? This action cannot be undone.</>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteLoading} onClick={() => setDeleteError(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction disabled={deleteLoading} onClick={handleDeleteProduct} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleteLoading ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
