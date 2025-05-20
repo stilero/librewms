@@ -42,13 +42,8 @@ interface ProductsResponse {
 }
 
 export const useProducts = (options: UseProductsOptions = {}) => {
-  // Convert options into state variables
-  const [page, setPage] = useState(options.page ?? 1)
-  const [pageSize, setPageSize] = useState(options.pageSize ?? 10)
-  const [sortBy, setSortBy] = useState<keyof Product>(options.sortBy ?? 'name')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(options.sortOrder ?? 'asc')
-  const [search, setSearch] = useState(options.search ?? '')
-  const [category, setCategory] = useState(options.category ?? '')
+  // Remove internal state for page, pageSize, sortBy, sortOrder, search, category
+  const { page = 1, pageSize = 10, sortBy = 'name', sortOrder = 'asc', search = '', category = '' } = options
 
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -135,7 +130,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     }
 
     fetchProducts()
-  }, [page, pageSize, sortBy, sortOrder, search, category]) // Dependencies updated to use state variables
+  }, [page, pageSize, sortBy, sortOrder, search, category]) // Use values from options directly
 
   const determineStockStatus = (product: Product): 'in_stock' | 'low_stock' | 'out_of_stock' => {
     if (product.stockLevel <= 0) return 'out_of_stock'
@@ -147,13 +142,6 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     products,
     isLoading,
     error,
-    pagination,
-    // Return the state setters directly
-    setPage,
-    setPageSize,
-    setSortBy,
-    setSortOrder,
-    setSearch,
-    setCategory
+    pagination
   }
 } 

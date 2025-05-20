@@ -2,12 +2,12 @@ import '@testing-library/jest-dom'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import ProductsPage from '../page'
 import { useProducts } from '../hooks/useProducts'
-import type { Product } from '../hooks/useProducts'
 
 // Mock the useProducts hook
 jest.mock('../hooks/useProducts')
+const mockedUseProducts = jest.mocked(useProducts);
 
-const mockProducts: Product[] = [
+const mockProducts = [
   {
     id: '1',
     sku: 'SKU-7723',
@@ -17,7 +17,7 @@ const mockProducts: Product[] = [
     stockLevel: 5,
     unitPrice: 129.99,
     costPrice: 80.00,
-    status: 'low_stock',
+    status: 'low_stock' as 'low_stock',
     isActive: true,
     isTaxable: true
   },
@@ -30,7 +30,7 @@ const mockProducts: Product[] = [
     stockLevel: 3,
     unitPrice: 59.99,
     costPrice: 35.00,
-    status: 'low_stock',
+    status: 'low_stock' as 'low_stock',
     isActive: true,
     isTaxable: true
   }
@@ -50,11 +50,17 @@ describe('ProductsPage', () => {
   })
 
   it('displays loading state initially', () => {
-    (useProducts as jest.Mock).mockReturnValue({
+    mockedUseProducts.mockReturnValue({
       products: [],
       isLoading: true,
       error: null,
-      pagination: mockPagination
+      pagination: mockPagination,
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     render(<ProductsPage />)
@@ -63,11 +69,17 @@ describe('ProductsPage', () => {
 
   it('displays error message when API call fails', () => {
     const errorMessage = 'Failed to fetch products'
-    ;(useProducts as jest.Mock).mockReturnValue({
+    mockedUseProducts.mockReturnValue({
       products: [],
       isLoading: false,
       error: new Error(errorMessage),
-      pagination: mockPagination
+      pagination: mockPagination,
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     render(<ProductsPage />)
@@ -75,40 +87,58 @@ describe('ProductsPage', () => {
   })
 
   it('displays products when API call succeeds', async () => {
-    ;(useProducts as jest.Mock).mockReturnValue({
+    mockedUseProducts.mockReturnValue({
       products: mockProducts,
       isLoading: false,
       error: null,
-      pagination: mockPagination
+      pagination: mockPagination,
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     render(<ProductsPage />)
 
-    await waitFor(() => {
-      expect(screen.getByText('Premium Headphones')).toBeInTheDocument()
-      expect(screen.getByText('Wireless Keyboard')).toBeInTheDocument()
-    })
+    // Use findByText for async queries
+    expect(await screen.findByText('Premium Headphones')).toBeInTheDocument()
+    expect(await screen.findByText('Wireless Keyboard')).toBeInTheDocument()
   })
 
-  it('displays empty state when no products are available', () => {
-    ;(useProducts as jest.Mock).mockReturnValue({
+  it('displays empty state when no products are available', async () => {
+    mockedUseProducts.mockReturnValue({
       products: [],
       isLoading: false,
       error: null,
-      pagination: { ...mockPagination, total: 0, totalPages: 0 }
+      pagination: { ...mockPagination, total: 0, totalPages: 0 },
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     render(<ProductsPage />)
-    expect(screen.getByText('No products found')).toBeInTheDocument()
+    // Use findByText for async queries
+    expect(await screen.findByText('No products found')).toBeInTheDocument()
   })
 
   it('handles pagination correctly', async () => {
-    const mockUseProducts = useProducts as jest.Mock
+    const mockUseProducts = mockedUseProducts
     mockUseProducts.mockReturnValue({
       products: mockProducts,
       isLoading: false,
       error: null,
-      pagination: mockPagination
+      pagination: mockPagination,
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     render(<ProductsPage />)
@@ -127,7 +157,13 @@ describe('ProductsPage', () => {
       products: mockProducts,
       isLoading: false,
       error: null,
-      pagination: { ...mockPagination, page: 2 }
+      pagination: { ...mockPagination, page: 2 },
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     fireEvent.click(screen.getByText('Previous'))
@@ -139,43 +175,109 @@ describe('ProductsPage', () => {
     })
   })
 
-  it('handles sorting correctly', async () => {
-    const mockUseProducts = useProducts as jest.Mock
+  it('handles sorting for all supported columns and ignores unsupported columns', async () => {
+    const mockUseProducts = mockedUseProducts
     mockUseProducts.mockReturnValue({
       products: mockProducts,
       isLoading: false,
       error: null,
-      pagination: mockPagination
+      pagination: mockPagination,
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     render(<ProductsPage />)
 
-    // Sort by name
-    fireEvent.click(screen.getByText('Product Name'))
+    // Supported columns
+    const supported = [
+      { label: 'SKU', sortBy: 'sku' },
+      { label: 'Product Name', sortBy: 'name' },
+      { label: 'Category', sortBy: 'category' }
+    ]
+    for (const { label, sortBy } of supported) {
+      fireEvent.click(screen.getByText(label))
+      await waitFor(() => {
+        expect(mockUseProducts).toHaveBeenCalledWith(expect.objectContaining({
+          sortBy,
+          sortOrder: 'asc'
+        }))
+      })
+      fireEvent.click(screen.getByText(label))
+      await waitFor(() => {
+        expect(mockUseProducts).toHaveBeenCalledWith(expect.objectContaining({
+          sortBy,
+          sortOrder: 'desc'
+        }))
+      })
+    }
+
+    // Unsupported columns
+    const unsupported = ['Stock', 'Unit Price', 'Status']
+    for (const label of unsupported) {
+      mockUseProducts.mockClear()
+      fireEvent.click(screen.getByText(label))
+      // Should not trigger a new call with that label as sortBy
+      expect(mockUseProducts).not.toHaveBeenCalledWith(expect.objectContaining({ sortBy: label }))
+    }
+  })
+
+  it('supports keyboard accessibility for sorting', async () => {
+    const mockUseProducts = mockedUseProducts
+    mockUseProducts.mockReturnValue({
+      products: mockProducts,
+      isLoading: false,
+      error: null,
+      pagination: mockPagination,
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
+    })
+
+    render(<ProductsPage />)
+
+    // Tab to SKU header and press Enter
+    const skuHeader = screen.getByRole('button', { name: /sort by sku/i })
+    skuHeader.focus()
+    fireEvent.keyDown(skuHeader, { key: 'Enter', code: 'Enter' })
+    await waitFor(() => {
+      expect(mockUseProducts).toHaveBeenCalledWith(expect.objectContaining({
+        sortBy: 'sku',
+        sortOrder: 'asc'
+      }))
+    })
+
+    // Tab to Name header and press Space
+    const nameHeader = screen.getByRole('button', { name: /sort by product name/i })
+    nameHeader.focus()
+    fireEvent.keyDown(nameHeader, { key: ' ', code: 'Space' })
     await waitFor(() => {
       expect(mockUseProducts).toHaveBeenCalledWith(expect.objectContaining({
         sortBy: 'name',
         sortOrder: 'asc'
       }))
     })
-
-    // Sort by name in descending order
-    fireEvent.click(screen.getByText('Product Name'))
-    await waitFor(() => {
-      expect(mockUseProducts).toHaveBeenCalledWith(expect.objectContaining({
-        sortBy: 'name',
-        sortOrder: 'desc'
-      }))
-    })
   })
 
   it('handles search correctly', async () => {
-    const mockUseProducts = useProducts as jest.Mock
+    const mockUseProducts = mockedUseProducts
     mockUseProducts.mockReturnValue({
       products: mockProducts,
       isLoading: false,
       error: null,
-      pagination: mockPagination
+      pagination: mockPagination,
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     render(<ProductsPage />)
@@ -192,20 +294,28 @@ describe('ProductsPage', () => {
   })
 
   it('handles category filtering correctly', async () => {
-    const mockUseProducts = useProducts as jest.Mock
+    const mockUseProducts = mockedUseProducts
     mockUseProducts.mockReturnValue({
       products: mockProducts,
       isLoading: false,
       error: null,
-      pagination: mockPagination
+      pagination: mockPagination,
+      setPage: jest.fn(),
+      setPageSize: jest.fn(),
+      setSortBy: jest.fn(),
+      setSortOrder: jest.fn(),
+      setSearch: jest.fn(),
+      setCategory: jest.fn()
     })
 
     render(<ProductsPage />)
 
     // Open category dropdown
     fireEvent.click(screen.getByRole('combobox'))
-    // Select Electronics category
-    fireEvent.click(screen.getByText('Electronics'))
+    // Select Electronics category (pick the dropdown item, not the table cell)
+    const electronicsOptions = screen.getAllByText('Electronics')
+    // The dropdown item is usually the last one
+    fireEvent.click(electronicsOptions[electronicsOptions.length - 1])
 
     await waitFor(() => {
       expect(mockUseProducts).toHaveBeenCalledWith(expect.objectContaining({

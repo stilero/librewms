@@ -41,7 +41,10 @@ export default function ProductsPage() {
     category: selectedCategory === 'all' ? '' : selectedCategory
   })
 
+  const sortableFields: Array<keyof Product> = ['sku', 'name', 'category']
+
   const handleSort = useCallback((field: keyof Product) => {
+    if (!sortableFields.includes(field)) return
     if (field === sortBy) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
     } else {
@@ -131,42 +134,48 @@ export default function ProductsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px] cursor-pointer" onClick={() => handleSort('sku')}>
+                <TableHead
+                  className="w-[100px] cursor-pointer select-none"
+                  tabIndex={0}
+                  role="button"
+                  aria-label="Sort by SKU"
+                  onClick={() => handleSort('sku')}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleSort('sku')}
+                >
                   <div className="flex items-center">
                     SKU
                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'sku' ? 'opacity-100' : 'opacity-50'}`} />
                   </div>
                 </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
+                <TableHead
+                  className="cursor-pointer select-none"
+                  tabIndex={0}
+                  role="button"
+                  aria-label="Sort by Product Name"
+                  onClick={() => handleSort('name')}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleSort('name')}
+                >
                   <div className="flex items-center">
                     Product Name
                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'name' ? 'opacity-100' : 'opacity-50'}`} />
                   </div>
                 </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
+                <TableHead
+                  className="cursor-pointer select-none"
+                  tabIndex={0}
+                  role="button"
+                  aria-label="Sort by Category"
+                  onClick={() => handleSort('category')}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleSort('category')}
+                >
                   <div className="flex items-center">
                     Category
                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'category' ? 'opacity-100' : 'opacity-50'}`} />
                   </div>
                 </TableHead>
-                <TableHead className="text-center cursor-pointer" onClick={() => handleSort('stockLevel')}>
-                  <div className="flex items-center justify-center">
-                    Stock
-                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'stockLevel' ? 'opacity-100' : 'opacity-50'}`} />
-                  </div>
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('unitPrice')}>
-                  <div className="flex items-center justify-end">
-                    Unit Price
-                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'unitPrice' ? 'opacity-100' : 'opacity-50'}`} />
-                  </div>
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('status')}>
-                  <div className="flex items-center">
-                    Status
-                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortBy === 'status' ? 'opacity-100' : 'opacity-50'}`} />
-                  </div>
-                </TableHead>
+                <TableHead className="text-center select-none">Stock</TableHead>
+                <TableHead className="select-none text-right">Unit Price</TableHead>
+                <TableHead className="select-none">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
