@@ -53,7 +53,7 @@ export default function ProductsPage() {
     }
   }, [sortBy, sortOrder])
 
-  if (isLoading) {
+  if (isLoading && products.length === 0) {
     return (
       <div className="flex items-center justify-center h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -130,7 +130,13 @@ export default function ProductsPage() {
           </div>
         </div>
       ) : (
-        <div className="rounded-md border">
+        <div className="relative rounded-md border">
+          {/* Table overlay for smoother loading */}
+          {isLoading && products.length > 0 && (
+            <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 flex items-center justify-center z-10">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+            </div>
+          )}
           <Table>
             <TableHeader>
               <TableRow>
