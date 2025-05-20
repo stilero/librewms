@@ -5,7 +5,8 @@ module.exports = {
     '^@/components/ui/(.*)$': '<rootDir>/components/ui/$1',
     '^@/components/(.*)$': '<rootDir>/components/$1',
     '^@/lib/(.*)$': '<rootDir>/lib/$1',
-    '^@/(.*)$': '<rootDir>/app/$1',
+    '^@/constants/(.*)$': '<rootDir>/constants/$1',
+    // '^@/(.*)$': '<rootDir>/app/$1',
   },
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
   transform: {

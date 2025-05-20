@@ -20,6 +20,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useState, useCallback } from "react"
 import { useDebounce } from "../../hooks/useDebounce"
+import { PRODUCT_CATEGORIES_WITH_ALL } from "@/constants/categories"
 
 export default function ProductsPage() {
   const [page, setPage] = useState(1)
@@ -103,11 +104,9 @@ export default function ProductsPage() {
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="electronics">Electronics</SelectItem>
-              <SelectItem value="clothing">Clothing</SelectItem>
-              <SelectItem value="furniture">Furniture</SelectItem>
-              <SelectItem value="food">Food & Beverage</SelectItem>
+              {PRODUCT_CATEGORIES_WITH_ALL.map(cat => (
+                <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Button variant="outline" size="icon">

@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch"
 import { Package, Save, ImagePlus } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { PRODUCT_CATEGORIES } from "@/constants/categories"
 
 // Define the form schema with validation
 const productFormSchema = z.object({
@@ -213,12 +214,9 @@ export function EditProductForm({ productId }: EditProductFormProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="electronics">Electronics</SelectItem>
-                            <SelectItem value="clothing">Clothing</SelectItem>
-                            <SelectItem value="furniture">Furniture</SelectItem>
-                            <SelectItem value="food">Food & Beverage</SelectItem>
-                            <SelectItem value="office">Office Supplies</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                            {PRODUCT_CATEGORIES.map(cat => (
+                              <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

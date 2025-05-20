@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { toast } from "@/hooks/use-toast"
 import { createProduct } from "@/app/actions/product-actions"
+import { PRODUCT_CATEGORIES } from "@/constants/categories"
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -178,12 +179,9 @@ const defaultValues: Partial<ProductFormValues> = {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="electronics">Electronics</SelectItem>
-                              <SelectItem value="clothing">Clothing</SelectItem>
-                              <SelectItem value="furniture">Furniture</SelectItem>
-                              <SelectItem value="food">Food & Beverage</SelectItem>
-                              <SelectItem value="office">Office Supplies</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
+                              {PRODUCT_CATEGORIES.map(cat => (
+                                <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />

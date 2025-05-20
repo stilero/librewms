@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { PRODUCT_CATEGORIES_WITH_ALL } from "@/constants/categories"
 
 export default function StockPage() {
   return (
@@ -45,10 +46,9 @@ export default function StockPage() {
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="electronics">Electronics</SelectItem>
-              <SelectItem value="furniture">Furniture</SelectItem>
-              <SelectItem value="office">Office Supplies</SelectItem>
+              {PRODUCT_CATEGORIES_WITH_ALL.map(cat => (
+                <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select defaultValue="all">
